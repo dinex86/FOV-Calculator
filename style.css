@@ -1,0 +1,46 @@
+body{
+	font-family: "Trebuchet MS", sans-serif;
+	margin: 3vmin;
+}
+
+body>div:first-child {
+	justify-content: center;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+#screensize-handle, #distance-handle {
+	width: 2em;
+	height: 1.5em;
+	top: 50%;
+	margin-top: -.75em;
+	margin-left: -1em;
+	text-align: center;
+	line-height: 1.5em;
+}
+
+label {
+	display: block;
+	margin: 1em 0 0.3em 0;
+	font-weight: bold;
+}
+
+fieldset label:first-of-type {
+	margin-top: 0;
+}
+
+.ui-slider {
+	margin-top: 0.7em;
+}
+
+fieldset {
+	border: 1px solid silver;
+	padding: 1em;
+	min-width: 300px;
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
