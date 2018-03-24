@@ -16,12 +16,12 @@ var allGames = {
 		}
 	},
 	'hfov_base_step': {
-		"F1 2016/2017/+": {
-			min: -2,
-			max: +2,
+		"F1 2016/2017/+": { // https://www.reddit.com/r/F1Game/comments/7x0of9/codemasters_f1_20162017_fov_slider/
+			min: -1,
+			max: +1,
 			decimals: 2,
 			factor: 1,
-			base: 77, // T-cam + nose: 82, t-cam offset 85
+			base: 77, // Base values for other cameras: T-Cam + Nose: 82, T-Cam with offset: 85
 			increment: 2,
 			step: 0.05, // slider step
 		}
