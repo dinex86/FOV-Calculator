@@ -15,6 +15,17 @@ var allGames = {
 			factor: 1
 		}
 	},
+	'hfov_base_step': {
+		"F1 2016/2017/+": {
+			min: -2,
+			max: +2,
+			decimals: 2,
+			factor: 1,
+			base: 77, // T-cam + nose: 82, t-cam offset 85
+			increment: 2,
+			step: 0.05, // slider step
+		}
+	},
 	'vfov' : {
 		"rFactor 1 & 2, GSC, GSCE, SCE, AMS": {
 			min: 10,
@@ -136,7 +147,7 @@ function calculateFOV() {
 			// Calculate game.
 			var value = '';
 			var unit;
-			if (calcGroup == 'hfov') {
+			if (calcGroup == 'hfov' || calcGroup == 'hfov_base_step') {
 				value = arcConstant * (hAngle * screens);
 				unit = '°';
 			} else if (calcGroup == 'vfov' || calcGroup == 'vfovx') {
@@ -154,6 +165,12 @@ function calculateFOV() {
 			if (calcGroup == 'vfovx') {
 				value /= (screens == 1 ? game.baseSingle : game.baseTriple);
 				unit = 'x';
+			}
+			
+			if (calcGroup == 'hfov_base_step') {
+				// ((target - base) / increemnt) * step
+				value = Math.round((value - game.base) / game.increment) * game.step;
+				unit = '';
 			}
 			
 			// Check min/max.
