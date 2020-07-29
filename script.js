@@ -1,6 +1,6 @@
 var allGames = {
 	'hfov': {
-		"Project CARS 1 & 2": {
+		"hFov, Project CARS 1 & 2": {
 			min: 35,
 			max: 180,
 			decimals: 0,
@@ -27,7 +27,7 @@ var allGames = {
 		}
 	},
 	'vfov' : {
-		"rFactor 1 & 2, GSC, GSCE, SCE, AMS": {
+		"vFov, rFactor 1 & 2, GSC, GSCE, SCE, AMS": {
 			min: 10,
 			max: 100,
 			decimals: 0,
