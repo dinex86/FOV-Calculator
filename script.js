@@ -154,7 +154,7 @@ function calculateFOV() {
 				value = arcConstant * vAngle;
 				unit = '°';
 			} else if (calcGroup == 'hfovrad') {
-				value = arcConstant * (hAngle * screens);
+				value = arcConstant * _calcAngle(width / x * y / 3 * 4, distanceToScreenInCm);
 				unit = 'rad';
 			}
 			
