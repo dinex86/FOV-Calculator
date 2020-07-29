@@ -71,6 +71,14 @@ var allGames = {
 			baseSingle: 58,
 			baseTriple: 58
 		}
+	},
+	'tangle': {
+		"Tripple Screen Angle" : {
+			min: 10,
+			max: 180,
+			decimals: 2,
+			factor: 1
+		}
 	}
 };
 
@@ -156,6 +164,9 @@ function calculateFOV() {
 			} else if (calcGroup == 'hfovrad') {
 				value = arcConstant * _calcAngle(width / x * y / 3 * 4, distanceToScreenInCm);
 				unit = 'rad';
+			} else if (calcGroup == 'tangle') {
+				value = arcConstant * hAngle;
+				unit = '°';
 			}
 			
 			// Factor.
