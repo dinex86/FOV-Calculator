@@ -73,7 +73,7 @@ var allGames = {
 		}
 	},
 	'tangle': {
-		"Tripple Screen Angle" : {
+		"Triple Screen Angle" : {
 			min: 10,
 			max: 180,
 			decimals: 2,
