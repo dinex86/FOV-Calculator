@@ -15,11 +15,6 @@
 	<div>
 		<fieldset>
 			<legend>Input</legend>
-			<label for="screens">Screens</label>
-			<select name="screens" id="screens">
-			  <option value="1">Single Screen</option>
-			  <option value="3">Triple Screens</option>
-			</select>
 	
 			<label for="ratio">Screen Ratio</label>
 			<select name="ratio" id="ratio">
@@ -42,6 +37,18 @@
 				<div id="distance-handle" class="ui-slider-handle myhandle"></div>
 			</div>
 			<input type="hidden" id="distance" />
+
+			<label for="screens">Screens</label>
+			<select name="screens" id="screens">
+			  <option value="1">Single Screen</option>
+			  <option value="3">Triple Screens</option>
+			</select>
+
+			<label for="bezelSlider">Bezel Thickness (mm)</label>
+			<div id="bezelSlider">
+				<div id="bezel-handle" class="ui-slider-handle myhandle"></div>
+			</div>
+			<input type="hidden" id="bezel" />
 		</fieldset>
 		<fieldset>
 			<legend>Result</legend>
