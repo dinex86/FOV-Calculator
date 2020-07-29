@@ -105,7 +105,7 @@ $(document).ready(function() {
 		value: 50,
 		min: 30,
 		max: 200,
-		step: 5,
+		step: 1,
 		create: function() {
 			distanceHandle.text($(this).slider("value"));
 			$("#distance").val($(this).slider("value"));
