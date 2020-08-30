@@ -1,5 +1,5 @@
 body{
-	font-family: "Trebuchet MS", sans-serif;
+	font-family: "OpenSans", open-sans;
 	margin: 3vmin;
 }
 
@@ -9,7 +9,7 @@ body>div:first-child {
 	flex-wrap: wrap;
 }
 
-#screensize-handle, #distance-handle {
+#screensize-handle, #distance-handle, #bezel-handle {
 	width: 2em;
 	height: 1.5em;
 	top: 50%;

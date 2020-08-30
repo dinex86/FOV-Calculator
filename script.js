@@ -1,6 +1,6 @@
 var allGames = {
 	'hfov': {
-		"Project CARS 1 & 2": {
+		"hFov, Project CARS 1 & 2": {
 			min: 35,
 			max: 180,
 			decimals: 0,
@@ -27,7 +27,7 @@ var allGames = {
 		}
 	},
 	'vfov' : {
-		"rFactor 1 & 2, GSC, GSCE, SCE, AMS": {
+		"vFov, rFactor 1 & 2, GSC, GSCE, SCE, AMS": {
 			min: 10,
 			max: 100,
 			decimals: 0,
@@ -71,6 +71,14 @@ var allGames = {
 			baseSingle: 58,
 			baseTriple: 58
 		}
+	},
+	'tangle': {
+		"Triple Screen Angle" : {
+			min: 10,
+			max: 180,
+			decimals: 2,
+			factor: 1
+		}
 	}
 };
 
@@ -83,6 +91,7 @@ $(document).ready(function() {
 
 	var screensizeHandle = $('#screensize-handle');
 	var distanceHandle = $('#distance-handle');
+	var bezelHandle = $('#bezel-handle');
 	
 	$( "#screensizeSlider" ).slider({
 		range: false,
@@ -105,7 +114,7 @@ $(document).ready(function() {
 		value: 50,
 		min: 30,
 		max: 200,
-		step: 5,
+		step: 1,
 		create: function() {
 			distanceHandle.text($(this).slider("value"));
 			$("#distance").val($(this).slider("value"));
@@ -115,6 +124,22 @@ $(document).ready(function() {
 			$("#distance").val(ui.value);
 			calculateFOV();
 	    }
+	});
+
+	$( "#bezelSlider" ).slider({
+		range: false,
+		value: 0,
+		min: 0,
+		max: 100,
+		create: function() {
+			bezelHandle.text($(this).slider("value"));
+			$("#bezel").val($(this).slider("value"));
+		},
+		slide: function(event, ui) {
+			bezelHandle.text(ui.value);
+			$("#bezel").val(ui.value);
+			calculateFOV();
+		}
 	});
 	
 	calculateFOV();
@@ -129,10 +154,11 @@ function calculateFOV() {
 	var screens = parseInt($('#screens').val());
 	var screensizeDiagonal = parseFloat($('#screensize').val()) * 2.54;
 	var distanceToScreenInCm = parseFloat($('#distance').val());
+	var bezelThickness = parseFloat($('#bezel').val()) / 10 * 2;	
 	var numberOfScreens = 1;
 	
 	var height = Math.sin(Math.atan(y/x)) * screensizeDiagonal;
-	var width = Math.cos(Math.atan(y/x)) * screensizeDiagonal;
+	var width = Math.cos(Math.atan(y/x)) * screensizeDiagonal + bezelThickness;
 	
 	var hAngle = _calcAngle(width, distanceToScreenInCm);
 	var vAngle = _calcAngle(height, distanceToScreenInCm);
@@ -154,8 +180,11 @@ function calculateFOV() {
 				value = arcConstant * vAngle;
 				unit = '°';
 			} else if (calcGroup == 'hfovrad') {
-				value = arcConstant * (hAngle * screens);
+				value = arcConstant * _calcAngle(width / x * y / 3 * 4, distanceToScreenInCm);
 				unit = 'rad';
+			} else if (calcGroup == 'tangle') {
+				value = arcConstant * hAngle;
+				unit = '°';
 			}
 			
 			// Factor.
