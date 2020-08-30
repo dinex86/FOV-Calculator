@@ -1,6 +1,16 @@
 var allGames = {
 	'hfov': {
-		"hFov, Project CARS 1 & 2": {
+		"hFov": {
+			decimals: 0,
+			factor: 1
+		},
+		"Project CARS 1/2": {
+			min: 35,
+			max: 180,
+			decimals: 0,
+			factor: 1
+		},
+		"European & American Truck Simulator": {
 			min: 35,
 			max: 180,
 			decimals: 0,
@@ -27,9 +37,7 @@ var allGames = {
 		}
 	},
 	'vfov' : {
-		"vFov, rFactor 1 & 2, GSC, GSCE, SCE, AMS": {
-			min: 10,
-			max: 100,
+		"vFov": {
 			decimals: 0,
 			factor: 1
 		},
@@ -39,7 +47,13 @@ var allGames = {
 			decimals: 1,
 			factor: 1
 		},
-		"GRID Autosport, DiRT Rally": {
+		"rFactor 1 & 2, GSC, GSCE, SCE, AMS (ISI Engine)": {
+			min: 10,
+			max: 100,
+			decimals: 0,
+			factor: 1
+		},
+		"DiRT Rally 1/2, GRID Autosport": {
 			min: 10,
 			max: 115,
 			decimals: 0,
@@ -92,7 +106,7 @@ $(document).ready(function() {
 	var screensizeHandle = $('#screensize-handle');
 	var distanceHandle = $('#distance-handle');
 	var bezelHandle = $('#bezel-handle');
-	
+
 	$( "#screensizeSlider" ).slider({
 		range: false,
 		value: 27,
@@ -108,7 +122,7 @@ $(document).ready(function() {
 			calculateFOV();
 		}
 	});
-	
+
 	$( "#distanceSlider" ).slider({
 		range: false,
 		value: 50,
@@ -141,35 +155,34 @@ $(document).ready(function() {
 			calculateFOV();
 		}
 	});
-	
+
 	calculateFOV();
 });
 
 function calculateFOV() {
-	
+
 	var screenRatio = $('#ratio').val();
 	var x = parseFloat(screenRatio.substring(0, screenRatio.indexOf('_')));
 	var y = parseFloat(screenRatio.substring(screenRatio.indexOf('_') + 1));
-	
+
 	var screens = parseInt($('#screens').val());
 	var screensizeDiagonal = parseFloat($('#screensize').val()) * 2.54;
 	var distanceToScreenInCm = parseFloat($('#distance').val());
-	var bezelThickness = parseFloat($('#bezel').val()) / 10 * 2;	
-	var numberOfScreens = 1;
-	
+	var bezelThickness = parseFloat($('#bezel').val()) / 10 * 2;
+
 	var height = Math.sin(Math.atan(y/x)) * screensizeDiagonal;
-	var width = Math.cos(Math.atan(y/x)) * screensizeDiagonal + bezelThickness;
-	
+	var width = Math.cos(Math.atan(y/x)) * screensizeDiagonal + (screens > 1 ? bezelThickness : 0);
+
 	var hAngle = _calcAngle(width, distanceToScreenInCm);
 	var vAngle = _calcAngle(height, distanceToScreenInCm);
 	var arcConstant = (180 / Math.PI);
-	
+
 	var html = '<ul>';
 	for (var calcGroup in allGames) {
-		
+
 		for (var gameName in allGames[calcGroup]) {
 			var game = allGames[calcGroup][gameName];
-			
+
 			// Calculate game.
 			var value = '';
 			var unit;
@@ -186,43 +199,46 @@ function calculateFOV() {
 				value = arcConstant * hAngle;
 				unit = '°';
 			}
-			
+
 			// Factor.
 			value *= game.factor;
-			
+
 			// Further calculations.
 			if (calcGroup == 'vfovx') {
 				value /= (screens == 1 ? game.baseSingle : game.baseTriple);
 				unit = 'x';
 			}
-			
+
 			if (calcGroup == 'hfov_base_step') {
 				// ((target - base) / increemnt) * step
 				value = Math.round((value - game.base) / game.increment) * game.step;
 				unit = '';
 			}
-			
+
 			// Check min/max.
-			value = Math.max(value, game.min);
-			value = Math.min(value, game.max);
-			
+			value = game.min ? Math.max(value, game.min) : value;
+			value = game.max ? Math.min(value, game.max) : value;
+
 			// Final calculations.
 			if (calcGroup.indexOf('hfovrad') != -1) {
 				value *= (Math.PI / 180);
 			}
-			
+
 			// Output.
 			var base = Math.pow(10, game.decimals);
-			html += '<li>' + gameName + ': ' + (Math.round(value * base) / base).toFixed(game.decimals) + unit + '</li>';
+			html += '<li>';
+			html += '<span>' + gameName + '</span>';
+			html += '<span>' + (Math.round(value * base) / base).toFixed(game.decimals) + unit + '</span></li>';
+			html += '</li>';
 		}
 	}
-	
+
 	html += '</ul>';
-	
+
 	$('#fov').html(html);
 }
 
 function _calcAngle(baseInCm, distanceToMonitorInCm) {
 	return Math.atan(baseInCm / 2 / distanceToMonitorInCm) * 2;
-	return angle * (180 / Math.PI); 
+	return angle * (180 / Math.PI);
 }
