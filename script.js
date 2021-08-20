@@ -41,7 +41,7 @@ var allGames = {
 			decimals: 0,
 			factor: 1
 		},
-		"Assetto Corsa": {
+		"Assetto Corsa, Assetto Corsa Competizione": {
 			min: 10,
 			max: 120,
 			decimals: 1,
