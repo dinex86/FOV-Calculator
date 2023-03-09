@@ -15,7 +15,13 @@ var allGames = {
 			max: 180,
 			decimals: 0,
 			factor: 1
-		}
+		},
+		"RaceRoom Racing Experience" : {
+			min: 35,
+			max: 180,
+			decimals: 1,
+			factor: 1,
+		},
 	},
 	'hfovrad': {
 		"Richard Burns Rally": {
@@ -61,14 +67,6 @@ var allGames = {
 		}
 	},
 	'vfovx': {
-		"RaceRoom Racing Experience" : {
-			min: 0.5,
-			max: 1.5,
-			decimals: 1,
-			factor: 1,
-			baseSingle: 58,
-			baseTriple: 40
-		},
 		"GTR2" : {
 			min: 0.5,
 			max: 1.5,
