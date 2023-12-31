@@ -9,7 +9,7 @@ body>div:first-child {
 	flex-wrap: wrap;
 }
 
-#screensize-handle, #distance-handle, #bezel-handle {
+#screensize-handle, #distance-handle, #bezel-handle, #radius-handle {
 	width: 2em;
 	height: 1.5em;
 	top: 50%;
@@ -17,6 +17,10 @@ body>div:first-child {
 	margin-left: -1em;
 	text-align: center;
 	line-height: 1.5em;
+}
+
+#radius-handle {
+	width: 4em;
 }
 
 label {

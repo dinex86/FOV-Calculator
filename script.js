@@ -104,6 +104,7 @@ $(document).ready(function() {
 	var screensizeHandle = $('#screensize-handle');
 	var distanceHandle = $('#distance-handle');
 	var bezelHandle = $('#bezel-handle');
+	var radiusHandle = $('#radius-handle');
 
 	$( "#screensizeSlider" ).slider({
 		range: false,
@@ -154,6 +155,27 @@ $(document).ready(function() {
 		}
 	});
 
+	$( "#curved" ).change(function() {
+		calculateFOV();
+	});
+
+	$( "#radiusSlider" ).slider({
+		range: false,
+		value: 1000,
+		min: 50,
+		max: 3000,
+		step: 10,
+		create: function() {
+			radiusHandle.text("R"+$(this).slider("value"));
+			$("#radius").val($(this).slider("value"));
+		},
+		slide: function(event, ui) {
+			radiusHandle.text("R"+ui.value);
+			$("#radius").val(ui.value);
+			calculateFOV();
+		}
+	});
+
 	calculateFOV();
 });
 
@@ -167,12 +189,24 @@ function calculateFOV() {
 	var screensizeDiagonal = parseFloat($('#screensize').val()) * 2.54;
 	var distanceToScreenInCm = parseFloat($('#distance').val());
 	var bezelThickness = parseFloat($('#bezel').val()) / 10 * 2;
+	var curved = $('#curved').is(':checked');
+	var radiusInMm = parseInt($('#radius').val());
 
-	var height = Math.sin(Math.atan(y/x)) * screensizeDiagonal;
-	var width = Math.cos(Math.atan(y/x)) * screensizeDiagonal + (screens > 1 ? bezelThickness : 0);
+	var aspectRatioToSize = Math.sqrt((screensizeDiagonal * screensizeDiagonal) / ((x*x) + (y*y)));
+	var width = (x * aspectRatioToSize) + (screens > 1 ? bezelThickness : 0);
 
-	var hAngle = _calcAngle(width, distanceToScreenInCm);
-	var vAngle = _calcAngle(height, distanceToScreenInCm);
+	var hAngle = curved
+		? _calcCurvedAngle(width, radiusInMm, distanceToScreenInCm)
+		: _calcTriangularAngle(width, distanceToScreenInCm);
+	// Calculate from hAngle instead of real width so that games that take vFov have the correct
+	// hFov for curved monitors.
+	//
+	// Users have to choose between correct vFov and correct hFov, but this is minor - and, like
+	// flat monitors, vFov changes as we go left-to-right across the screen, unless the monitor
+	// is curved and radius == distance
+	var vAngle = 2 * Math.atan2(Math.tan(hAngle / 2) * y, x);
+	
+	// Radians to degrees factor
 	var arcConstant = (180 / Math.PI);
 
 	var html = '<ul>';
@@ -191,7 +225,7 @@ function calculateFOV() {
 				value = arcConstant * vAngle;
 				unit = '°';
 			} else if (calcGroup == 'hfovrad') {
-				value = arcConstant * _calcAngle(width / x * y / 3 * 4, distanceToScreenInCm);
+				value = arcConstant * _calcTriangularAngle(width / x * y / 3 * 4, distanceToScreenInCm);
 				unit = 'rad';
 			} else if (calcGroup == 'tangle') {
 				value = arcConstant * hAngle;
@@ -236,7 +270,58 @@ function calculateFOV() {
 	$('#fov').html(html);
 }
 
-function _calcAngle(baseInCm, distanceToMonitorInCm) {
-	return Math.atan(baseInCm / 2 / distanceToMonitorInCm) * 2;
-	return angle * (180 / Math.PI);
+function _calcTriangularAngle(baseInCm, distanceToMonitorInCm) {
+	return Math.atan2(baseInCm / 2, distanceToMonitorInCm) * 2;
+}
+
+function _calcCurvedAngle(baseInCm, radiusInMm, distanceToMonitorInCm) {
+	var radiusInCm = radiusInMm / 10;
+	/* First, figure out what the FOV would be if distance == radius
+	 * c = 2pi * r
+	 * theta = 2pi * (base / c)
+	 *       = 2pi * (base / (2pi * r))
+	 *       = base / r
+	 */
+	var arcAngleAtRadius = baseInCm / radiusInCm;
+	/* Draw a line between the left and right edges of the curved monitor.
+	 *
+	 * Let's find that distance and call it 'b'.
+	 *
+	 * On the other side of that line, we have a right angled triangle:
+	 *       | c  /
+	 *       |---/
+	 *       |  / r
+	 * r - b | /
+	 *       |/
+	 *       |
+	 *
+	 * cos (theta / 2) = (r - b) / r
+	 * r cos (theta / 2) = r - b
+	 * b = r(1 - cos(theta / 2))
+	 */
+	var b = radiusInCm * (1 - Math.cos(arcAngleAtRadius / 2));
+	
+	/* We also need the length of that imaginary line, 2c:
+	 * 
+	 * c = sqrt(r^2 - (r - b)^2)
+	 *   = sqrt(r^2 - (r^2 - 2rb + b^2))
+	 *   = sqrt(2rb - b^2)
+	 */
+	var c = Math.sqrt((2 * radiusInCm * b) - (b * b));
+	/* Just to keep the ascii art practical, let's use 'd' for the distance
+	 * to monitor; we now have another right-angled triangle:
+	 *
+	 *
+	 * |      -    -
+	 * | c    |    | b
+	 * |---/  |    -
+	 * |  /   | d  |
+	 * | /    |    | d - b
+	 * |/     -    -
+	 * 
+	 * The angle we want here is hFOV / 2, so:
+	 * 
+	 * hfov = 2 * atan(c / (d - b))
+	 */
+	return 2 * Math.atan2(c, distanceToMonitorInCm - b);
 }
