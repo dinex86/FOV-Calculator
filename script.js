@@ -166,11 +166,11 @@ $(document).ready(function() {
 		max: 3000,
 		step: 10,
 		create: function() {
-			radiusHandle.text("R"+$(this).slider("value"));
+			radiusHandle.text($(this).slider("value")+"R");
 			$("#radius").val($(this).slider("value"));
 		},
 		slide: function(event, ui) {
-			radiusHandle.text("R"+ui.value);
+			radiusHandle.text(ui.value+"R");
 			$("#radius").val(ui.value);
 			calculateFOV();
 		}
