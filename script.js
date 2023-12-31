@@ -32,7 +32,7 @@ var allGames = {
 		}
 	},
 	'hfov_base_step': {
-		"F1 2016/2017/+": { // https://www.reddit.com/r/F1Game/comments/7x0of9/codemasters_f1_20162017_fov_slider/
+		"F1 2016-2018": { // https://www.reddit.com/r/F1Game/comments/7x0of9/codemasters_f1_20162017_fov_slider/
 			min: -1,
 			max: +1,
 			decimals: 2,
@@ -40,6 +40,24 @@ var allGames = {
 			base: 77, // Base values for other cameras: T-Cam + Nose: 82, T-Cam with offset: 85
 			increment: 2,
 			step: 0.05, // slider step
+		},
+		"F1 2019-2020": {
+			min: -10,
+			max: +10,
+			decimals: 2,
+			factor: 1,
+			base: 77,
+			increment: 2,
+			step: 0.1,
+		},
+		"F1 2021+": {
+			min: -20,
+			max: +20,
+			decimals: 2,
+			factor: 1,
+			base: 77,
+			increment: 2,
+			step: 1,
 		}
 	},
 	'vfov' : {
