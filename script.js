@@ -44,7 +44,7 @@ var allGames = {
 		"F1 2019-2020": {
 			min: -10,
 			max: +10,
-			decimals: 2,
+			decimals: 1,
 			factor: 1,
 			base: 77,
 			increment: 2,
@@ -53,7 +53,7 @@ var allGames = {
 		"F1 2021+": {
 			min: -20,
 			max: +20,
-			decimals: 2,
+			decimals: 0,
 			factor: 1,
 			base: 77,
 			increment: 2,
