@@ -102,6 +102,17 @@ var allGames = {
 			baseTriple: 58
 		}
 	},
+	'vfov_base_step': {
+		"EA WRC": { // https://answers.ea.com/t5/General-Discussion/FOV-calculator/m-p/13185341/highlight/true#M1444
+			min: 0,
+			max: 100,
+			decimals: 0,
+			factor: 1,
+			base: 18,
+			increment: 0.5,
+			step: 1, // slider step
+		},
+	},
 	'tangle': {
 		"Triple Screen Angle" : {
 			min: 10,
@@ -239,7 +250,7 @@ function calculateFOV() {
 			if (calcGroup == 'hfov' || calcGroup == 'hfov_base_step') {
 				value = arcConstant * (hAngle * screens);
 				unit = '°';
-			} else if (calcGroup == 'vfov' || calcGroup == 'vfovx') {
+			} else if (calcGroup == 'vfov' || calcGroup == 'vfovx' || calcGroup == 'vfov_base_step') {
 				value = arcConstant * vAngle;
 				unit = '°';
 			} else if (calcGroup == 'hfovrad') {
@@ -259,7 +270,7 @@ function calculateFOV() {
 				unit = 'x';
 			}
 
-			if (calcGroup == 'hfov_base_step') {
+			if (calcGroup == 'hfov_base_step' || calcGroup == 'vfov_base_step') {
 				// ((target - base) / increemnt) * step
 				value = Math.round((value - game.base) / game.increment) * game.step;
 				unit = '';
