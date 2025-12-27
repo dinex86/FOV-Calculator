@@ -334,8 +334,8 @@ function calculateFOV() {
 			}
 
 			// Check min/max.
-			value = game.min ? Math.max(value, game.min) : value;
-			value = game.max ? Math.min(value, game.max) : value;
+			value = game.min != null ? Math.max(value, game.min) : value;
+			value = game.max != null ? Math.min(value, game.max) : value;
 
 			// Final calculations.
 			if (calcGroup.indexOf('hfovrad') != -1) {
