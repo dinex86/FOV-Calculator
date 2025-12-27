@@ -34,13 +34,21 @@
 			</div>
 			<input type="hidden" id="screensize" />
 
-			<label for="distanceSlider">Distance to Screen (cm)</label>
+			<label for="distanceSlider">Distance to Screen (cm/inches)</label>
+			<div style="margin: 0.5em 0;">
+				<label style="display: inline-block; margin-right: 1em; font-weight: normal;">
+					<input type="radio" name="distanceUnit" value="cm" checked> cm
+				</label>
+				<label style="display: inline-block; font-weight: normal;">
+					<input type="radio" name="distanceUnit" value="in"> inches
+				</label>
+			</div>
 			<div id="distanceSlider">
 				<div id="distance-handle" class="ui-slider-handle myhandle"></div>
 			</div>
 			<input type="hidden" id="distance" />
 
-			<label for="screens">Screens</label>
+			<label for="screens" style="margin-top: 2.5em;">Screens</label>
 			<select name="screens" id="screens">
 			  <option value="1">Single Screen</option>
 			  <option value="3">Triple Screens</option>

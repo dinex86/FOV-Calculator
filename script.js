@@ -123,6 +123,19 @@ var allGames = {
 	}
 };
 
+// Distance unit conversion: 1 inch = 2.54 cm
+var distanceUnit = 'cm'; // Current unit: 'cm' or 'in'
+var INCHES_TO_CM = 2.54;
+
+// Conversion functions
+function cmToInches(cm) {
+	return cm / INCHES_TO_CM;
+}
+
+function inchesToCm(inches) {
+	return inches * INCHES_TO_CM;
+}
+
 $(document).ready(function() {
 	$("select").selectmenu({
 		change: function(event, data) {
@@ -151,21 +164,64 @@ $(document).ready(function() {
 		}
 	});
 
-	$( "#distanceSlider" ).slider({
+	// Initialize distance slider
+	var distanceSlider = $( "#distanceSlider" ).slider({
 		range: false,
 		value: 50,
 		min: 30,
 		max: 200,
 		step: 1,
 		create: function() {
-			distanceHandle.text($(this).slider("value"));
-			$("#distance").val($(this).slider("value"));
+			updateDistanceDisplay();
 		},
 		slide: function( event, ui ) {
-	        distanceHandle.text(ui.value);
-			$("#distance").val(ui.value);
+			updateDistanceDisplay();
 			calculateFOV();
 	    }
+	});
+
+	// Function to update distance display with current unit
+	function updateDistanceDisplay() {
+		var sliderValue = $("#distanceSlider").slider("value");
+		var unitLabel = distanceUnit === 'cm' ? 'cm' : 'in';
+		// Slider value is already in the correct unit (cm or inches)
+		distanceHandle.text(Math.round(sliderValue * 10) / 10 + ' ' + unitLabel);
+		// Always store value in cm for calculations
+		$("#distance").val(distanceUnit === 'cm' ? sliderValue : inchesToCm(sliderValue));
+	}
+
+	// Handle unit toggle change
+	$('input[name="distanceUnit"]').change(function() {
+		var newUnit = $(this).val();
+		var currentSliderValue = $("#distanceSlider").slider("value");
+		var currentDistanceInCm = distanceUnit === 'cm' ? currentSliderValue : inchesToCm(currentSliderValue);
+		
+		// Update unit
+		distanceUnit = newUnit;
+		
+		// Convert slider value and ranges
+		if (newUnit === 'in') {
+			// Convert to inches: update slider value and ranges
+			var newValue = Math.round(cmToInches(currentDistanceInCm));
+			var minInches = Math.round(cmToInches(30));
+			var maxInches = Math.round(cmToInches(200));
+			$("#distanceSlider").slider({
+				value: newValue,
+				min: minInches,
+				max: maxInches
+			});
+		} else {
+			// Convert to cm: update slider value and ranges
+			var newValue = Math.round(currentDistanceInCm);
+			$("#distanceSlider").slider({
+				value: newValue,
+				min: 30,
+				max: 200
+			});
+		}
+		
+		updateDistanceDisplay();
+		calculateFOV();
 	});
 
 	$( "#bezelSlider" ).slider({
@@ -216,6 +272,7 @@ function calculateFOV() {
 
 	var screens = parseInt($('#screens').val());
 	var screensizeDiagonal = parseFloat($('#screensize').val()) * 2.54;
+	// Distance is always stored in cm in the hidden input, regardless of display unit
 	var distanceToScreenInCm = parseFloat($('#distance').val());
 	var bezelThickness = parseFloat($('#bezel').val()) / 10 * 2;
 	var curved = $('#curved').is(':checked');

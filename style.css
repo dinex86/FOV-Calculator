@@ -37,6 +37,10 @@ fieldset label:first-of-type {
 	margin-top: 0.7em;
 }
 
+#distanceSlider {
+	margin-bottom: 2em;
+}
+
 fieldset {
 	border: 1px solid silver;
 	padding: 1em 1.3em;
