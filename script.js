@@ -190,37 +190,45 @@ $(document).ready(function() {
 		$("#distance").val(distanceUnit === 'cm' ? sliderValue : inchesToCm(sliderValue));
 	}
 
-	// Handle unit toggle change
-	$('input[name="distanceUnit"]').change(function() {
-		var newUnit = $(this).val();
+	function setDistanceUnitAndValue(newUnit, valueInUnit) {
+		if (newUnit !== 'cm' && newUnit !== 'in') {
+			return;
+		}
 		var currentSliderValue = $("#distanceSlider").slider("value");
 		var currentDistanceInCm = distanceUnit === 'cm' ? currentSliderValue : inchesToCm(currentSliderValue);
-		
-		// Update unit
 		distanceUnit = newUnit;
-		
-		// Convert slider value and ranges
+
+		var targetValue = valueInUnit;
+		if (targetValue == null || isNaN(targetValue)) {
+			targetValue = newUnit === 'cm'
+				? Math.round(currentDistanceInCm)
+				: Math.round(cmToInches(currentDistanceInCm));
+		}
+
 		if (newUnit === 'in') {
-			// Convert to inches: update slider value and ranges
-			var newValue = Math.round(cmToInches(currentDistanceInCm));
 			var minInches = Math.round(cmToInches(30));
 			var maxInches = Math.round(cmToInches(200));
 			$("#distanceSlider").slider({
-				value: newValue,
+				value: targetValue,
 				min: minInches,
 				max: maxInches
 			});
 		} else {
-			// Convert to cm: update slider value and ranges
-			var newValue = Math.round(currentDistanceInCm);
 			$("#distanceSlider").slider({
-				value: newValue,
+				value: targetValue,
 				min: 30,
 				max: 200
 			});
 		}
-		
+
+		$('input[name="distanceUnit"][value="' + newUnit + '"]').prop('checked', true);
 		updateDistanceDisplay();
+	}
+
+	// Handle unit toggle change
+	$('input[name="distanceUnit"]').change(function() {
+		var newUnit = $(this).val();
+		setDistanceUnitAndValue(newUnit);
 		calculateFOV();
 	});
 
@@ -261,6 +269,127 @@ $(document).ready(function() {
 		}
 	});
 
+	function setCopyStatus(message, isError) {
+		var status = $('#copy-status');
+		status.text(message);
+		status.css('color', isError ? '#8a1f1f' : '#2a6c2a');
+	}
+
+	function buildShareUrl() {
+		var params = new URLSearchParams();
+		params.set('ratio', $('#ratio').val());
+		params.set('screens', $('#screens').val());
+		params.set('curved', $('#curved').is(':checked') ? '1' : '0');
+		params.set('screensize', $("#screensizeSlider").slider("value"));
+		params.set('bezel', $("#bezelSlider").slider("value"));
+		params.set('radius', $("#radiusSlider").slider("value"));
+		params.set('distanceUnit', distanceUnit);
+		params.set('distance', $("#distanceSlider").slider("value"));
+
+		return window.location.origin + window.location.pathname + '?' + params.toString();
+	}
+
+	function copyTextToClipboard(text) {
+		if (navigator.clipboard && navigator.clipboard.writeText) {
+			return navigator.clipboard.writeText(text);
+		}
+
+		return new Promise(function(resolve, reject) {
+			var temp = document.createElement('textarea');
+			temp.value = text;
+			temp.setAttribute('readonly', '');
+			temp.style.position = 'absolute';
+			temp.style.left = '-9999px';
+			document.body.appendChild(temp);
+			temp.select();
+
+			var success = false;
+			try {
+				success = document.execCommand('copy');
+			} catch (error) {
+				success = false;
+			}
+
+			document.body.removeChild(temp);
+			if (success) { resolve(); }
+			else { reject(); }
+		});
+	}
+
+	$('#copy-link').on('click', function() {
+		var url = buildShareUrl();
+		copyTextToClipboard(url).then(function() {
+			setCopyStatus('Link copied to clipboard.');
+		}).catch(function() {
+			setCopyStatus('Copy failed. Select and copy the URL from the address bar.', true);
+		});
+	});
+
+	function applyQueryParams() {
+		var params = new URLSearchParams(window.location.search);
+
+		if (params.has('ratio')) {
+			var ratio = params.get('ratio');
+			if ($('#ratio option[value="' + ratio + '"]').length) {
+				$('#ratio').val(ratio).selectmenu('refresh');
+			}
+		}
+
+		if (params.has('screens')) {
+			var screens = params.get('screens');
+			if ($('#screens option[value="' + screens + '"]').length) {
+				$('#screens').val(screens).selectmenu('refresh');
+			}
+		}
+
+		if (params.has('curved')) {
+			var curved = params.get('curved');
+			var curvedBool = curved === '1' || curved === 'true' || curved === 'yes' || curved === 'on';
+			$('#curved').prop('checked', curvedBool);
+		}
+
+		if (params.has('screensize')) {
+			var screensize = parseFloat(params.get('screensize'));
+			if (!isNaN(screensize)) {
+				$("#screensizeSlider").slider("value", screensize);
+				screensizeHandle.text(screensize + '\'\'' );
+				$("#screensize").val(screensize);
+			}
+		}
+
+		if (params.has('bezel')) {
+			var bezel = parseFloat(params.get('bezel'));
+			if (!isNaN(bezel)) {
+				$("#bezelSlider").slider("value", bezel);
+				bezelHandle.text(bezel);
+				$("#bezel").val(bezel);
+			}
+		}
+
+		if (params.has('radius')) {
+			var radius = parseFloat(params.get('radius'));
+			if (!isNaN(radius)) {
+				$("#radiusSlider").slider("value", radius);
+				radiusHandle.text(radius + "R");
+				$("#radius").val(radius);
+			}
+		}
+
+		var distanceUnitParam = params.get('distanceUnit');
+		var distanceParam = params.get('distance');
+		if (distanceUnitParam) {
+			var distanceValue = distanceParam != null ? parseFloat(distanceParam) : null;
+			setDistanceUnitAndValue(distanceUnitParam, distanceValue);
+		} else if (distanceParam != null) {
+			var distanceValueDefaultUnit = parseFloat(distanceParam);
+			if (!isNaN(distanceValueDefaultUnit)) {
+				$("#distanceSlider").slider("value", distanceValueDefaultUnit);
+				updateDistanceDisplay();
+			}
+		}
+	}
+
+	applyQueryParams();
 	calculateFOV();
 });
 
